@@ -59,6 +59,7 @@ namespace GoF2Remake.Flight
             public bool hidden;              // not drawn and not lockable now (the wormhole while invisible)
             public string name;
             public NpcShip dockingShip;     // docking targets: the object
+            public bool freelance;          // waypoints: a freelance mission's route (the white freelance icon, not the gold story one)
             public Vector3 Position => transform != null ? transform.position : fixedPosition;
         }
 
@@ -103,13 +104,13 @@ namespace GoF2Remake.Flight
         /// <summary>A campaign level's player route (Level+0x108, PlayerEgo::setRoute): its current waypoint is a landmark
         /// target named "Waypoint" (548): marked on the HUD, lockable, and the autopilot flies to it; "Waypoint reached."
         /// (543) / "Last waypoint reached." (544) as the route advances.</summary>
-        public void SetRoute(Route route)
+        public void SetRoute(Route route, bool freelance = false)
         {
             playerRoute = route;
             routeTarget = null;
             Targets.RemoveAll(t => t.kind == Kind.Waypoint);
             if (route == null) return;
-            routeTarget = new Target { kind = Kind.Waypoint, name = Localization.Get(548) };
+            routeTarget = new Target { kind = Kind.Waypoint, name = Localization.Get(548), freelance = freelance };
             routeIndex = route.index;
             UpdateRoute();
         }

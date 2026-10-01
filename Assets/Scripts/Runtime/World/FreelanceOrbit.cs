@@ -324,7 +324,7 @@ namespace GoF2Remake.World
             otherKills = keepOther;
             levelMs = 0f;
             RouteText = EncodeRoute(PlayerRoute);
-            level.Navigation?.SetRoute(PlayerRoute);
+            level.Navigation?.SetRoute(PlayerRoute, true);
             Debug.Log($"FreelanceOrbit: {mission.Name} taken over, {enemies.Count} enemies, {friends.Count} friends, {junk.Count} junk" +
                       $"{(inheritedEnemies || inheritedFriends ? " (inherited)" : "")}");
         }
@@ -367,7 +367,7 @@ namespace GoF2Remake.World
             {
                 RouteText = route;
                 PlayerRoute = DecodeRoute(route);
-                level.Navigation?.SetRoute(PlayerRoute);
+                level.Navigation?.SetRoute(PlayerRoute, true);
             }
             // Ore Mining: a stand-in of the runner's plant at its route point, to unload at here (ObjectDocking).
             if (mission.type == MissionType.OreMining && localPlant == null && PlayerRoute != null && PlayerRoute.points.Count > 0)

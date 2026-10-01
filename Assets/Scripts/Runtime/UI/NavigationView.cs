@@ -129,7 +129,7 @@ namespace GoF2Remake.UI
                 {
                     m.icon = new VisualElement { pickingMode = PickingMode.Ignore };
                     m.icon.AddToClassList("nav-abs");
-                    Image(m.icon, Tex(t.kind == Navigation.Kind.Waypoint ? "map_story" : wormhole ? "wormhole_icon" : "gate_icon"));
+                    Image(m.icon, Tex(t.kind == Navigation.Kind.Waypoint ? (t.freelance ? "map_freelance" : "map_story") : wormhole ? "wormhole_icon" : "gate_icon"));
                     layer.Add(m.icon);
                 }
                 // Radar::draw: the gold story icon 0x454 next to the campaign target's planet (visible missions only).
