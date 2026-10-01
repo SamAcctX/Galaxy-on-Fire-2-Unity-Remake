@@ -247,7 +247,7 @@ namespace GoF2Remake.Flight
 
         Rig BuildRig(Gun gun)
         {
-            var rig = new Rig { visuals = new GunRig(gun, WeaponFx.Load(gun.itemIndex), fxRoot, transform) };
+            var rig = new Rig { visuals = new GunRig(gun, WeaponFx.Load(gun.itemIndex), fxRoot, FirePose) };
             rig.visuals.EnableTrails();   // RocketGun::setRadar: the player's rockets / missiles / thermo shots trail smoke
             var fx = rig.fx;
             if (fx != null && fx.shotLoops && fx.shot != null)
@@ -308,7 +308,7 @@ namespace GoF2Remake.Flight
                 if (!r.gun.isSecondary || r.gun.itemIndex != SelectedSecondary || r.stack == null || r.stack.amount <= 0) continue;
                 if (r.gun.kind == Gun.Kind.Sentry && !SentryGun.CanDeploy) return false;   // Level+0x6c > 2: refused, no cost
                 if (Cheats.NoSecondaryCooldown) r.gun.reloadAcc = r.gun.reloadMs + 1f;   // remake debug: reloaded at once
-                int b = r.gun.TryFire(transform);
+                int b = r.gun.TryFire(FirePose);
                 if (b < 0) continue;
                 if (r.gun.kind == Gun.Kind.Sentry)
                 {
@@ -367,7 +367,7 @@ namespace GoF2Remake.Flight
                 var gun = r.gun;
                 if (!gun.isSecondary && primaryHeld)
                 {
-                    int b = gun.TryFire(transform);
+                    int b = gun.TryFire(FirePose);
                     if (b >= 0) OnShot(r, r == soundRig);
                 }
                 gun.Update(dtMs, Target.All, homing);
@@ -407,6 +407,17 @@ namespace GoF2Remake.Flight
             return v.z > 0f && v.x >= 0f && v.x <= 1f && v.y >= 0f && v.y <= 1f ? t : null;
         }
         FreeLookCamera freeLook;
+        ShipController shipController;
+        /// <summary>Where the shots leave: the banked, tilted model (ShipController.visualModel) when the ship has one, so
+        /// bullets and muzzle flashes follow the wings through a turn (the root never rolls); else the ship itself.</summary>
+        Transform FirePose
+        {
+            get
+            {
+                if (shipController == null) shipController = GetComponent<ShipController>();
+                return shipController != null && shipController.visualModel != null ? shipController.visualModel : transform;
+            }
+        }
 
         void OnShot(Rig r, bool sound = true)
         {
