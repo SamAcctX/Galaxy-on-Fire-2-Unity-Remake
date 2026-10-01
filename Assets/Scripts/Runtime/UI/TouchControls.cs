@@ -65,6 +65,7 @@ namespace GoF2Remake.UI
         public Func<float> GetThrust;
         public Action<float> SetThrust;
         public Action<Vector2, bool> FreeLookDrag; // screen-pixel delta (y up), still held
+        public Action<float> FreeLookPinch;        // two-finger span change in screen pixels
 
         /// <summary>The stick, offset / 94 per axis (x right, y up), not squared.</summary>
         public Vector2 Stick { get; private set; }
@@ -322,6 +323,14 @@ namespace GoF2Remake.UI
             {
                 if (!gestures.TryGetValue(e.pointerId, out var g)) return;
                 var p = (Vector2)e.localPosition;
+                // Free look: two fingers pinch-zoom (as in PhotoMode), one orbits.
+                if (frame.freeLook && gestures.Count >= 2)
+                {
+                    float span0 = Span();
+                    g.last = p;
+                    FreeLookPinch?.Invoke(ToScreenDelta(new Vector2(Span() - span0, 0f)).x);
+                    return;
+                }
                 if (frame.freeLook) FreeLookDrag?.Invoke(ToScreenDelta(p - g.last), true);
                 g.last = p;
                 if (frame.freeLook) return;
@@ -342,6 +351,14 @@ namespace GoF2Remake.UI
             gestureZone.RegisterCallback<PointerUpEvent>(e => EndGesture(e.pointerId, e.localPosition, true));
             gestureZone.RegisterCallback<PointerCancelEvent>(e => EndGesture(e.pointerId, e.localPosition, false));
             gestureZone.RegisterCallback<PointerCaptureOutEvent>(e => gestures.Remove(e.pointerId));
+        }
+
+        float Span()
+        {
+            Vector2 a = Vector2.zero;
+            int n = 0;
+            foreach (var o in gestures.Values) { if (n++ == 0) a = o.last; else return (o.last - a).magnitude; }
+            return 0f;
         }
 
         float Width => layer.contentRect.width > 0f ? layer.contentRect.width : 1920f;

@@ -224,6 +224,7 @@ namespace GoF2Remake.UI
                 GetThrust = () => ship != null ? ship.Model.Throttle : 0f,
                 SetThrust = t => ship?.SetThrottle(t),
                 FreeLookDrag = (delta, held) => level?.FreeLook?.TouchDrag(delta, held),
+                FreeLookPinch = span => level?.FreeLook?.TouchPinch(span),
             };
         }
 
