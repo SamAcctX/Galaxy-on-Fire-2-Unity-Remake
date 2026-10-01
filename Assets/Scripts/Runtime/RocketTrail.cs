@@ -11,6 +11,9 @@
 //   25-27  thermo guns 28 / 29 / 30 (25 also the cluster missiles, sort 40): size 50 / 100 / 150, every 50 units, 25
 //       sections, 1000 ms, the gold / red / purple strips (0, 0.625)-(0.125, 0.875) + 0.125 per record
 //   (28, SunFire o50: another manager, Level+0x98, not built.)
+//   12  SET_MISSILE_TRAIL, every other RocketGun sort (EMP bombs built here): not a ribbon but one sprite system on
+//       Level+0x84 (sprite_fire, additive) at the bullet, flags 0x2000021 like record 42: 60/s, 1250 ms, size 250..299
+//       +250/s, local velocity (0, 0, -6000), 700 behind the bullet, emitting while it lives (MissileTrail).
 // A launch resets the system; the bullet's death stops the emission and (sorts 4 / 5 / 40) the trail is drawn 2000 ms more
 // (RocketGun+0xd4). NPC guns never get one (setRadar is the player's). Remake: one camera-facing ribbon instead of the
 // crossed pair (the same from every side), each section showing the whole strip (mirrored every other section).
@@ -46,6 +49,20 @@ namespace GoF2Remake.Flight
             if (gun.kind == Gun.Kind.Thermo)
                 return gun.itemIndex switch { 28 => Thermo(0, 50f, false), 29 => Thermo(1, 100f, false), 30 => Thermo(2, 150f, false), _ => null };
             return null;
+        }
+
+        /// <summary>Record 12 for an EMP bomb (setRadar's last case, addSystem(Level+0x84, bullet, 0xc)); null otherwise.
+        /// Emission off: Play / Stop per launch, the pose set each frame.</summary>
+        public static ParticleSystem MissileTrail(Gun gun, Transform parent)
+        {
+            var mat = gun.kind == Gun.Kind.EmpBomb ? CombatAssets.Load()?.fireMaterial : null;
+            if (mat == null) return null;
+            var ps = ShipSmoke.Create(parent, "Missile trail", mat, 1.25f, 250f, 299f, 76, 0f, Vector3.zero, -700f, 250f, 1);
+            var main = ps.main;
+            main.startSpeed = -6000f * M;   // +0x6c, along the bullet's -Z (the box shape emits along +Z)
+            var em = ps.emission;
+            em.rateOverTime = 60f;
+            return ps;
         }
 
         readonly Record rec;
