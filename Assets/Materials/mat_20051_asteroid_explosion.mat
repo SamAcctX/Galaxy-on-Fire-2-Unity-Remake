@@ -48,7 +48,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ScreenSpaceReflectionsContributeTransparent: 1
-    - _UseVertexColor: 1
+    - _UseVertexColor: 0
     - _WritesColor: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
