@@ -29,7 +29,7 @@ namespace GoF2Remake.Flight
         Mining mining;
         AudioSource main, extra, boostSource;
         int engine = -1, boost = -1;
-        bool wasBoosting;
+        bool wasBoosting, wasHalted;
         /// <summary>MGame::OnInitialize starts the engine loop only above campaign index 1: the prologue's and the rescue's
         /// Phantom is silent (index 0 swaps it for the broken engine 156, IntroCutscenes).</summary>
         bool storySilent;
@@ -93,6 +93,15 @@ namespace GoF2Remake.Flight
         void Update()
         {
             if (ship == null) return;
+            // A conversation or menu stops the clock (Time.timeScale 0) but not the sources: the loops, and a boost that
+            // had just started, played on through it. Multiplayer keeps the clock (and its sound) running.
+            bool halted = Time.timeScale <= 0f;
+            if (halted != wasHalted)
+            {
+                foreach (var s in new[] { main, extra, boostSource }) if (s != null) { if (halted) s.Pause(); else s.UnPause(); }
+                wasHalted = halted;
+            }
+            if (halted) return;
             if (health == null) health = GetComponent<PlayerHealth>();
             if (mining == null) mining = GetComponent<Mining>();
             bool visible = ship.visualModel == null || ship.visualModel.gameObject.activeInHierarchy;
