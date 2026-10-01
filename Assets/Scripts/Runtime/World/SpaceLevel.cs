@@ -412,6 +412,7 @@ namespace GoF2Remake.World
         }
 
         bool riding, rode;
+        float rideHoldMs;
         /// <summary>The level is being left (wormhole ride, docking): the story checks stop.</summary>
         public bool Leaving { get; private set; }
 
@@ -427,6 +428,10 @@ namespace GoF2Remake.World
                 RideWormhole();
                 return;
             }
+            // Step 24: Carla's "What is this thing? KEITH!" (radio line 4, text 1921) starts as the wormhole opens and shows
+            // 2 s later; the ride waits for it (8 s at most), or the scene load swallows the line.
+            if (active && index == 24 && Campaign.Radio != null && Campaign.Radio.Triggered(4) && !Campaign.Radio.Over(4)
+                && (rideHoldMs += Time.deltaTime * 1000f) < 8000f) return;
             if (active)
             {
                 if (index == 29 || index == 41 || (index == 40 && Campaign.Event <= 3)) { riding = true; Health.Kill(); return; }
