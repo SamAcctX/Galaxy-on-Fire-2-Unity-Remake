@@ -129,13 +129,6 @@ namespace GoF2Remake.Visuals
             tk.uvRepeats = tex != null && tex.wrapMode == TextureWrapMode.Repeat;
         }
 
-        /// <summary>A UV-scrolling part whose texture repeats (not a clamped effect atlas).</summary>
-        static bool UvScrollsAnyway(Track tk)
-        {
-            InitMaterialTrack(tk);
-            return tk.uvRepeats;
-        }
-
         /// <summary>How often the looping animation has wrapped (the storm sky re-rolls its rotation on each).</summary>
         public int Loops { get; private set; }
 
@@ -292,7 +285,15 @@ namespace GoF2Remake.Visuals
                 // animates them on any mesh (the burning stations' fire and smoke, plasma beams and streams, projectiles, gas
                 // clouds); the clamped effect atlases are left alone (a scrolled cell would smear its edge). `extra` stays opt-in.
                 bool uvAnimated = tk.uv != null || tk.uvY != null;
-                if ((applyMaterialChannels && (tk.extra != null || uvAnimated)) || (uvAnimated && UvScrollsAnyway(tk)))
+                if (uvAnimated)
+                {
+                    InitMaterialTrack(tk);
+                    // Opted in or not, an atlas (_MainTex_ST) scrolls only when its texture repeats: on a clamped effect
+                    // atlas the offset slid the cell into its neighbours (the Raccoon's beam, item 228, smeared). The sky
+                    // layers' _UVOffset wraps in the shader.
+                    if (tk.uvMode == 2 && !tk.uvRepeats) uvAnimated = false;
+                }
+                if ((applyMaterialChannels && (tk.extra != null || uvAnimated)) || (uvAnimated && tk.uvRepeats))
                 {
                     InitMaterialTrack(tk);
                     if (tk.renderer == null) continue;
