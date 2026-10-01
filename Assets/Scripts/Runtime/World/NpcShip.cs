@@ -294,7 +294,7 @@ namespace GoF2Remake.World
         /// <summary>The shock blast: 'center' and 'radius' in Unity metres.</summary>
         public void InitPush(Vector3 center, float radius)
         {
-            if (IsFixed || IsFreighter || radius <= 0f) return;
+            if (IsFixed || IsFreighter || IsTurret || radius <= 0f) return;   // a battleship's turrets stay mounted
             var away = transform.position - center;
             float d = away.magnitude;
             pushTotalMs = pushMs = (1f - Mathf.Min(d / radius, 1f)) * PushMaxMs;
