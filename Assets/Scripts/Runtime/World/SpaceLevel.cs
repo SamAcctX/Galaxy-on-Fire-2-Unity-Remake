@@ -478,7 +478,9 @@ namespace GoF2Remake.World
         {
             if (mainCamera == null) mainCamera = Camera.main;
             mainCamera.nearClipPlane = 20f * M;
-            mainCamera.farClipPlane = 300000f * M;
+            // StarSystem::render: 300000, 450000 in the alien orbit before mission 0x50 (the Void's fighters sit up to
+            // 100000 out and the wormhole reopens 60000-100000 out while the player arrives 170000-220000 out).
+            mainCamera.farClipPlane = (Layout != null && Layout.alienOrbit && Story.Index < 0x50 ? 450000f : 300000f) * M;
             mainCamera.clearFlags = CameraClearFlags.Skybox;
         }
 
