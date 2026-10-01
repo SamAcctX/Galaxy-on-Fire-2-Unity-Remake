@@ -201,7 +201,7 @@ namespace GoF2Remake.Flight
             projectilesDone(dtMs, cam);
         }
 
-        /// <summary>The beam: at the mount, along the fire-time direction, scaled to its length (units).</summary>
+        /// <summary>The beam: at the mount, re-aimed every frame, scaled to its length (units).</summary>
         void UpdateBeam(float dtMs)
         {
             var t = projectiles.Length > 0 ? projectiles[0] : null;
@@ -209,12 +209,22 @@ namespace GoF2Remake.Flight
             if (beamMs <= 0f) { if (t.gameObject.activeSelf) t.gameObject.SetActive(false); return; }
             beamMs -= dtMs;
             var from = ship != null ? ship.TransformPoint(gun.mountLocal) : gun.bullets[0].position;
+            // BeamGun::update aims the beam every frame: at the locked target while it lives, else straight ahead. Kept at
+            // its fire-time direction it trailed off the nose through a turn (the beam shows for a second per shot).
             var dir = gun.BeamDir.sqrMagnitude > 1e-9f ? gun.BeamDir : Vector3.forward;
-            // BeamGun::update: setDirection(beamDir, up (0, 1, 0)), world up (the crossed planes don't roll with the ship);
-            // a beam fired straight up / down takes the ship's up instead.
-            var up = Mathf.Abs(Vector3.Dot(dir.normalized, Vector3.up)) > 0.999f && ship != null ? ship.up : Vector3.up;
+            float length = gun.BeamLengthUnits;
+            var target = gun.BeamTarget;
+            if (target != null && target.gameObject.activeInHierarchy)
+            {
+                var d = target.position - from;
+                if (d.sqrMagnitude > 1e-6f) { dir = d.normalized; length = d.magnitude / Gun.MetersPerUnit; }
+            }
+            else if (ship != null) { dir = ship.forward; length = Gun.BeamRangeUnits; }
+            // setDirection(beamDir, up (0, 1, 0)), world up (the crossed planes don't roll with the ship); a beam fired
+            // straight up / down takes the ship's up instead.
+            var up = Mathf.Abs(Vector3.Dot(dir, Vector3.up)) > 0.999f && ship != null ? ship.up : Vector3.up;
             t.SetPositionAndRotation(from, Quaternion.LookRotation(dir, up));
-            t.localScale = new Vector3(1f, 1f, gun.BeamLengthUnits);
+            t.localScale = new Vector3(1f, 1f, length);
             if (beamMs <= 0f) t.gameObject.SetActive(false);
         }
 

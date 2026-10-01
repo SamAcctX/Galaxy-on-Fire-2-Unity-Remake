@@ -49,7 +49,7 @@ namespace GoF2Remake.Flight
         public const float MetersPerUnit = 0.05f;
         const float CoastMs = 2000f;          // rockets/missiles keep flying (and hitting) past their lifetime
         const float SpawnForwardUnits = 100f; // offset = mount + (0, 0, 100)
-        const float BeamRangeUnits = 30000f;  // no target: the beam's bullet is parked this far ahead
+        public const float BeamRangeUnits = 30000f;  // no target: the beam's bullet is parked this far ahead
         const float MineSpeedUnits = 2f, MineStopMs = 500f, MinePullUnitsPerFrame = 200f;
         const float ShockBlastRadiusUnits = 80000f;
 
@@ -83,6 +83,8 @@ namespace GoF2Remake.Flight
         /// <summary>The last beam's world direction and length (units), set when it fires.</summary>
         public Vector3 BeamDir { get; private set; }
         public float BeamLengthUnits { get; private set; }
+        /// <summary>The target the last beam locked, null = none (straight ahead).</summary>
+        public Transform BeamTarget { get; private set; }
 
         /// <summary>Raised when a bullet hits: (bullet index, target, hit point). Rockets on asteroids: the bullet lives on.</summary>
         public event Action<int, Target, Vector3> Hit;
@@ -196,12 +198,14 @@ namespace GoF2Remake.Flight
                     var d = target.transform.position - from;
                     BeamDir = d.normalized;
                     BeamLengthUnits = d.magnitude / MetersPerUnit;
+                    BeamTarget = target.transform;
                     bb.position = target.transform.position;
                 }
                 else
                 {
                     BeamDir = fwd;
                     BeamLengthUnits = BeamRangeUnits;
+                    BeamTarget = null;
                     bb.position = from + fwd * BeamRangeUnits * MetersPerUnit;
                 }
                 bb.velocity = fwd * MetersPerUnit;   // a unit vector (1 u/ms): hits the target centre on the next pass
