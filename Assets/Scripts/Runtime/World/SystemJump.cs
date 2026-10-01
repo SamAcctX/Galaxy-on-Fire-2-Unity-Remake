@@ -222,8 +222,9 @@ namespace GoF2Remake.World
             }
             nav.Paused = true;
             if (weapons != null) weapons.Blocked = true;
-            // askForJumpIntoAlienWorld outside the Void (remake: only after the main story, whose Void is reached by wormholes).
-            bool askVoid = !Session.FreePlay && Story.GameWon;
+            // askForJumpIntoAlienWorld outside the Void: the original asks whenever the Khador map opens (Status+0x78 is
+            // the Void's default station, index -1). Remake: once a wormhole has shown the player the Void (step 24).
+            bool askVoid = !Session.FreePlay && Story.Index > 24;
             var map = StarMap.Open(db, StarMapMode.Khador, true, r =>
             {
                 nav.Paused = false;
