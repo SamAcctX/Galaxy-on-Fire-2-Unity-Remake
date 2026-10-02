@@ -330,7 +330,7 @@ namespace GoF2Remake.World
                 case 24: if (index == 24) Tick24(dtMs); break;
                 case 25: if (index == 26 && Step == 0 && Triggered(1)) { Hole?.ResetTimer(false); Hole?.SetVisible(true); Step = 1; } break;
                 case 29: if (index == 29) Tick29(dtMs); break;
-                case 40: if (index == 40) Tick40(); break;
+                case 40: if (index == 40) Tick40(dtMs); break;
                 case 41: if (index == 41) Tick41(dtMs); else if (index == 42) Tick42(dtMs); break;
             }
         }
@@ -548,7 +548,7 @@ namespace GoF2Remake.World
         }
 
         // 40: Errkt's freighter through the wormhole (M40).
-        void Tick40()
+        void Tick40(float dtMs)
         {
             var f = S(0);
             if (f == null) return;
@@ -592,6 +592,10 @@ namespace GoF2Remake.World
                     if (Hole != null && z >= Hole.GamePosition.z) Step = 4;
                     break;
                 case 4:
+                    // LevelScript::process 0x28 event 4: moveForward((z - holeZ) - dt) on top of the 1 u/ms, so the distance past
+                    // the wormhole doubles every frame and the freighter is gone in half a second (the original's 200000 is
+                    // its hole's z); then parked and deactivated, which fires Keith's line (trigger 0x18).
+                    if (Hole != null) f.transform.position += f.transform.forward * ((z - Hole.GamePosition.z) - dtMs) * M;
                     if (z > 500000f)
                     {
                         f.Place(ToUnity(new Vector3(0, 0, -200000)), Dir(new Vector3(0, 0, 1)));
