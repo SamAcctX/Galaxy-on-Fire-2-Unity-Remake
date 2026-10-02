@@ -346,10 +346,9 @@ namespace GoF2Remake.Flight
             {
                 op.WithControlsHavingToMatchPath("<Gamepad>")
                   .WithExpectedControlType(single && row.padType == "Vector2" ? "Vector2" : "Button");
-                // Stick directions would catch a drifting stick; a whole stick is the Vector2 slot's.
-                foreach (var stick in new[] { "leftStick", "rightStick" })
-                    foreach (var dir in new[] { "up", "down", "left", "right" })
-                        op.WithControlsExcluding($"<Gamepad>/{stick}/{dir}");
+                // A stick direction is a valid button (roll, throttle, the dodge on the right stick); a drifting stick stays
+                // below the half-way mark that a deliberate push passes.
+                op.WithMagnitudeHavingToBeGreaterThan(0.5f);
             }
             else
             {
