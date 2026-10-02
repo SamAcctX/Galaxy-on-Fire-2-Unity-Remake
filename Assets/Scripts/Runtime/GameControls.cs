@@ -37,7 +37,9 @@ namespace GoF2Remake.Flight
     [Unity.Scripting.LifecycleManagement.NoAutoStaticsCleanup]
     public static class GameControls
     {
-        const string PrefsKey = "controls_bindings";
+        // v2: action|bindingIndex=overridePath per line. v1 stored the Input System's own JSON, keyed by binding ids that
+        // AddBinding regenerates on every launch, so nothing ever loaded back.
+        const string PrefsKey = "controls_bindings2";
         const string KeyGroup = "Keyboard", PadGroup = "Gamepad";
 
         public static readonly InputActionMap Map = new InputActionMap("Flight");
@@ -175,17 +177,23 @@ namespace GoF2Remake.Flight
         static void Load()
         {
             Map.RemoveAllBindingOverrides();
-            string json = PlayerPrefs.GetString(PrefsKey, "");
-            if (json.Length > 0)
+            foreach (var line in PlayerPrefs.GetString(PrefsKey, "").Split('\n'))
             {
-                try { Map.LoadBindingOverridesFromJson(json); }
-                catch (Exception e) { Debug.LogWarning("GameControls: bindings not loaded: " + e.Message); }
+                int bar = line.IndexOf('|'), eq = line.IndexOf('=');
+                if (bar < 0 || eq < bar) continue;
+                var a = Map.FindAction(line.Substring(0, bar));
+                if (a != null && int.TryParse(line.Substring(bar + 1, eq - bar - 1), out int i) && i >= 0 && i < a.bindings.Count)
+                    a.ApplyBindingOverride(i, line.Substring(eq + 1));   // "" = unbound
             }
         }
 
         static void Save()
         {
-            PlayerPrefs.SetString(PrefsKey, Map.SaveBindingOverridesAsJson());
+            var sb = new System.Text.StringBuilder();
+            foreach (var a in Map.actions)
+                for (int i = 0; i < a.bindings.Count; i++)
+                    if (a.bindings[i].overridePath != null) sb.Append(a.name).Append('|').Append(i).Append('=').Append(a.bindings[i].overridePath).Append('\n');
+            PlayerPrefs.SetString(PrefsKey, sb.ToString());
             PlayerPrefs.Save();
         }
 
