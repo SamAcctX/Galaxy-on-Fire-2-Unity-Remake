@@ -777,7 +777,9 @@ namespace GoF2Remake.World
             int text = baseText;
             foreach (int t in Session.StoryTargets) if (t >= 0) text -= 2;
             if (afterKill && (text < 0x889 || text > 0x88d)) return;
-            Radio(text, text, SystemRace);
+            // Kind 0xf (after a kill) is Keith's own line: createRadioMessage sets image 0 for it; only 0xe takes a race face.
+            if (afterKill) QueueLine(text, 0, GenericVoice.For(text));
+            else Radio(text, text, SystemRace);
         }
 
         /// <summary>Level::updateOrbit: relaunches and raider waves (not in a campaign orbit).</summary>
