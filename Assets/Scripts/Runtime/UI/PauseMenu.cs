@@ -236,6 +236,13 @@ namespace GoF2Remake.UI
                 Text(MissionsWindow.FreelanceText(db, m));
             }
             else Text(Localization.Get(174));
+            // MissionsWindow::init adds the 3219 "Most Wanted" tab wherever Status::wantedBoardAccessible holds (by the system's
+            // race, in flight too): the board's names and bounties.
+            if (db != null && Session.StationIndex >= 0 && WantedBoard.Accessible(db, Session.StationIndex))
+            {
+                Text(T(3219), "pause-heading");
+                foreach (var w in WantedBoard.ListFor(db, Session.StationIndex)) Text($"{w.name} · {ItemInfo.Credits(w.reward)}");
+            }
         }
 
         /// <summary>The cargo hold: every cargo stack with its tonnage, and the load against the capacity.</summary>
