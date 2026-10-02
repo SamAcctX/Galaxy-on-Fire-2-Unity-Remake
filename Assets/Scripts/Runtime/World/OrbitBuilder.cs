@@ -147,10 +147,16 @@ namespace GoF2Remake.World
                 var o = station.AddComponent<GoF2Remake.Flight.Obstacle>();
                 o.landmark = o.isStation = true;
                 o.volumes = GoF2Remake.Flight.CollisionVolume.ForStation(layout.stationIndex, layout.systemIndex < 0);
-                // PlayerStation+0x150: the transform's bounding radius + 5000 units.
+                // PlayerStation+0x150: the transform's bounding radius + 5000 units (PlayerStation::outerCollide tests |p - station|
+                // per axis against it). The radius is about the station's origin, so take the farthest face of the renderers'
+                // bounds from the origin, not half their span: a lopsided station (Tornard's second hub, 3 km out) was left
+                // outside the cube, and the cube is only a prefilter for the volumes.
                 var b = new Bounds(station.transform.position, Vector3.zero);
                 foreach (var r in station.GetComponentsInChildren<Renderer>()) b.Encapsulate(r.bounds);
-                o.cubeHalf = Mathf.Max(b.extents.x, b.extents.y, b.extents.z) + 5000f * M;
+                var p = station.transform.position;
+                float far = Mathf.Max(Mathf.Max(Mathf.Abs(b.max.x - p.x), Mathf.Abs(b.min.x - p.x)), Mathf.Max(Mathf.Abs(b.max.y - p.y), Mathf.Abs(b.min.y - p.y)),
+                                      Mathf.Max(Mathf.Abs(b.max.z - p.z), Mathf.Abs(b.min.z - p.z)));
+                o.cubeHalf = far + 5000f * M;
             }
             if (jumpgate != null)
             {
