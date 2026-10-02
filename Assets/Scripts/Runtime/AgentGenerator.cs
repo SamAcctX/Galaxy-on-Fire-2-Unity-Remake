@@ -111,7 +111,7 @@ namespace GoF2Remake.Data
             var story = new List<StoryAgentData>();
             if (campaign > 16)
                 foreach (var s in AgentData.StoryAgents)
-                    if (s.station == station && s.station != 106) story.Add(s);   // 106: only after winning the DLC1 duel (not built)
+                    if (s.station == station && (s.station != 106 || Story.Dlc1Won)) story.Add(s);   // 106 Sao Perula: Parham once DLC1 is won
 
             int n = story.Count;
             if (station != 108) n = R(2) + story.Count + 3 < 5 ? story.Count + 3 + R(2) : 5;
