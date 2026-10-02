@@ -356,8 +356,7 @@ namespace GoF2Remake.UI
                     var stored = Session.KaamoShips[row.equipment];
                     tex = ItemInfo.ShipIcon(row.ship);
                     name.text = ItemInfo.ShipName(row.ship);
-                    int race = row.ship < Shop.ShipRace.Length ? Shop.ShipRace[row.ship] : 0;
-                    subText.text = (race <= 3 || race == 8 ? Localization.Get(406 + race) : "") + (stored.mods.Count > 0 ? "  (+)" : "");
+                    subText.text = stored.mods.Count > 0 ? "(+)" : "";
                     price.text = ItemInfo.Credits(hangar.StoredPrice(row.equipment));   // the sell value
                     break;
                 }
@@ -365,8 +364,7 @@ namespace GoF2Remake.UI
                 {
                     tex = ItemInfo.ShipIcon(row.ship);
                     name.text = ItemInfo.ShipName(row.ship);
-                    int race = row.ship < Shop.ShipRace.Length ? Shop.ShipRace[row.ship] : 0;
-                    subText.text = race <= 3 || race == 8 ? Localization.Get(406 + race) : "";
+                    subText.text = "";
                     int delta = hangar.ShipPrice(row.ship) - hangar.ShipPrice(Session.ShipIndex);   // trade-in difference
                     price.text = ItemInfo.Credits(delta);
                     price.EnableInClassList("row-price--expensive", delta > Session.Credits);
@@ -601,8 +599,7 @@ namespace GoF2Remake.UI
                 var s = db.Ship(selected.ship);
                 detailIcon.style.backgroundImage = new StyleBackground(ItemInfo.ShipIcon(selected.ship));
                 detailName.text = ItemInfo.ShipName(selected.ship);
-                int race = selected.ship < Shop.ShipRace.Length ? Shop.ShipRace[selected.ship] : 0;
-                detailSub.text = race <= 3 || race == 8 ? T(406 + race) : "";
+                detailSub.text = "";
                 if (s != null) foreach (var (label, value) in ItemInfo.ShipStats(s, hangar.ShipPrice(selected.ship))) AddStat(label, value);
                 detailText.text = T(977 + selected.ship);
                 if (selected.kind == RowKind.ShopShip)

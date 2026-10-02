@@ -203,8 +203,8 @@ namespace GoF2Remake.UI
             Begin();
             icon.style.backgroundImage = new StyleBackground(ItemInfo.ShipIcon(ship));
             nameLabel.text = ItemInfo.ShipName(ship);
+            subLabel.text = "";   // ListItemWindow::set shows no race; the dealer-table race below only picks the model variant
             int race = ship < Shop.ShipRace.Length ? Shop.ShipRace[ship] : 0;
-            subLabel.text = race <= 3 || race == 8 ? T(406 + race) : "";
             var cur = db.Ship(Session.ShipIndex);
             int Cmp(float v, float c) => cur == null ? 2 : v < c ? -1 : v > c ? 1 : 0;
             bool mine = ship == Session.ShipIndex;
