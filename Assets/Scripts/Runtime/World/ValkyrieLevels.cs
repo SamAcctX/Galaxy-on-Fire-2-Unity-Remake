@@ -376,6 +376,7 @@ namespace GoF2Remake.World
             // [0] Alice's battlestation, unrotated (scenery with the station's volumes mirrored; the radio doesn't count it).
             c.AddPlaceholder();
             battlestation = Scenery("v_station_battlestation_anim_mission_object", host, OrbitLayout.RotationToUnity(Vector3.zero), "Valkyrie battlestation");
+            if (battlestation != null) GoF2Remake.Visuals.PartAnimation.HoldAll(battlestation);   // PlayerStation::update: 101 never animates
             AddStationVolumes(battlestation, true);
             // [1-12] turrets and shield generators: at host + (-x, y, -z), rotation (0, 0, -rz) (the table rotated by (0, pi, 0)).
             int rank = Session.Rank;
@@ -406,7 +407,7 @@ namespace GoF2Remake.World
             // [0] the battlestation (hidden until it drops out of hyperspace), [1-8] Void fighters.
             c.AddPlaceholder();
             battlestation = Scenery("v_station_battlestation_anim_mission_object", Vector3.zero, Quaternion.identity, "Valkyrie battlestation");
-            if (battlestation != null) battlestation.SetActive(false);
+            if (battlestation != null) { GoF2Remake.Visuals.PartAnimation.HoldAll(battlestation); battlestation.SetActive(false); }   // as at 80
             AddStationVolumes(battlestation, false);
             for (int i = 0; i < 8; i++)
                 c.SpawnShip(Standing.Void, 8, new Vector3(Sign() * (20000 + R(80000)), Sign() * (20000 + R(80000)), Sign() * (20000 + R(80000))), false);
