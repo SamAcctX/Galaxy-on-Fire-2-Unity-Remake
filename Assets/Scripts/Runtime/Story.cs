@@ -481,9 +481,9 @@ namespace GoF2Remake.Data
                     ParkOwnShip();
                     LendShip(39, new ItemStack(181, 1), new ItemStack(52, 1), new ItemStack(58, 1), new ItemStack(83, 1));
                     break;
-                case 59:   // the rival convoys at Suttnar, Ohna and Dekato; the Liberator blueprint locked again
+                case 59:   // the rival convoys at Suttnar, Ohna and Dekato. BluePrint::lock here is the original's no-op (it
+                           // sets unlocked, blueprints_mods.md): the Liberator stays producible.
                     Session.StoryTargets = new List<int> { 56, 45, 22 };
-                    Session.UnlockedBlueprints.Remove(179);
                     Session.StoryMission.value = 0;
                     break;
                 case 60:   // 50 000 + 50 000 per convoy freighter the Liberator destroyed (Player::damage, weapon 0xb3)
