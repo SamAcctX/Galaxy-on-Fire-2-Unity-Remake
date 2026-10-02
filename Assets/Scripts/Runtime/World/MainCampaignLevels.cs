@@ -654,7 +654,9 @@ namespace GoF2Remake.World
                     if (stepMs >= 15000f) Step = 3;
                     break;
                 case 3:
-                    f.Place(ToUnity(new Vector3(2006, -31500, -86720)), f.transform.forward);
+                    // LevelScript::process 0x29 state 3: setPosition(2006, -31500, -86720), AEGeometry::setRotation(-0.4, 0, 1.8)
+                    // (the floats are in the binary at 0x16c69a-0x16c6b0): on its side along the mothership's arm, nose up a little.
+                    f.transform.SetPositionAndRotation(ToUnity(new Vector3(2006, -31500, -86720)), OrbitLayout.RotationToUnity(new Vector3(-0.4f, 0f, 1.8f)));
                     f.SetExhaust(false);
                     cam.LookAtUnity(f.transform.position + ToUnity(new Vector3(-6000, 3000, -8000)), f.transform);
                     for (int i = 1; i < c.Ships.Count; i++) S(i)?.SetOnlyEnemy(level.Health.Target);
