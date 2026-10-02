@@ -274,12 +274,13 @@ namespace GoF2Remake.World
             c.FailObjective = () => c.ShipDestroyed(0);                          // 1 (0): the outpost destroyed
         }
 
-        /// <summary>StarSystem::getPlanets()[1]: the second planet billboard (game units, -20000 * its direction).</summary>
+        /// <summary>StarSystem::getPlanets()[1]: the planet of system.stations[0] (entry 0 of the original's list is the sun,
+        /// space_backdrop.md; the remake's list has no sun), in game units, -20000 * its direction.</summary>
         Vector3 Planet1()
         {
             var planets = level.Layout.planets;
             if (planets.Count == 0) return new Vector3(0, 0, -20000);
-            var p = planets[Mathf.Min(1, planets.Count - 1)];
+            var p = planets[0];
             return -OrbitLayout.BackdropDistance * OrbitLayout.Direction(p.pitch, p.yaw);
         }
 
